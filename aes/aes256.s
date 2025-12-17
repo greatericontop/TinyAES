@@ -295,6 +295,72 @@ aes256_dec:
     push rbp
     mov rbp, rsp
 
+    # rdi: points to ciphertext
+    # rsi: points to plaintext
+    # rdx: points to key bytes
 
+    movdqu xmm1, [rdi]
+
+    # R14 add round key
+    movdqu xmm0, [rdx + 224]
+    pxor xmm1, xmm0
+
+    # R14/13
+    movdqu xmm0, [rdx + 208]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    movdqu xmm0, [rdx + 192]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    movdqu xmm0, [rdx + 176]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    movdqu xmm0, [rdx + 160]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    movdqu xmm0, [rdx + 144]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    movdqu xmm0, [rdx + 128]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    movdqu xmm0, [rdx + 112]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    movdqu xmm0, [rdx + 96]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    movdqu xmm0, [rdx + 80]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    movdqu xmm0, [rdx + 64]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    movdqu xmm0, [rdx + 48]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    movdqu xmm0, [rdx + 32]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    movdqu xmm0, [rdx + 16]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    movdqu xmm0, [rdx]
+    aesdeclast xmm1, xmm0
+
+    movdqu [rsi], xmm1
     leave
     ret

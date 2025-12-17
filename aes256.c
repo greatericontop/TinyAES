@@ -32,6 +32,13 @@ int main() {
   print_text("Plaintext:  ", plaintext);
   aes256_enc(plaintext, ciphertext, expanded_key);
   print_text("Ciphertext: ", ciphertext);
+  unsigned char decrypted[16];
+  aes256_dec(ciphertext, decrypted, expanded_key);
+  print_text("Decrypted:  ", decrypted);
+
+  unsigned char ciphertext2[16] = {0x82, 0x9b, 0x10, 0xd3, 0x32, 0x0a, 0x1a, 0x51, 0x3f, 0x8e, 0x49, 0x36, 0x58, 0x89, 0x61, 0x12};
+  aes256_dec(ciphertext2, decrypted, expanded_key);
+  print_text("Decrypted2: ", decrypted);
 
   return 0;
 }
