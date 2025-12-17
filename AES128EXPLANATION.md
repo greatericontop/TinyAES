@@ -2,7 +2,7 @@
 
 This guide tries to explain the assembly code in `aes128.s` in detail.
 
-### How AES-128 Works
+## How AES-128 Works
 
 At the most basic level, AES-128 encrypts a 16-byte chunk of plaintext data into a 16-byte chunk of ciphertext data using a 16-byte cipher key.
 
@@ -17,6 +17,8 @@ The algorithm works roughly as follows:
 - Round 10
   - The last round is different because it omits the MixColumns step.
     - We use a CPU instruction for this as well.
+
+## Encryption
 
 ### Setup
 
@@ -235,3 +237,70 @@ Round 10 uses the `aesenclast` instruction, which performs the final AES round w
     ret
 
 Place the ciphertext in `xmm1` at the location in memory pointed to by `rsi` (the second argument). Then `leave` and `ret` cleans up the stack and returns to the caller.
+
+## Decryption
+
+### Precalculate the entire key schedule
+
+    movdqa xmm3, xmm0
+    aeskeygenassist xmm2, xmm0, 0x01
+    pshufd xmm2, xmm2, 0xff
+    pxor xmm0, xmm2
+    pslldq xmm3, 4
+    pxor xmm0, xmm3
+    pslldq xmm3, 4
+    pxor xmm0, xmm3
+    pslldq xmm3, 4
+    pxor xmm0, xmm3
+    movdqa [rbp-16], xmm0
+
+Instead of calculating round keys on the fly like in encryption, the decryption calculates each round key and stores them on the stack.
+The round 1 key is stored at `[rbp-16]`.
+(If you're unfamiliar with assembly, local variables stored on the stack are usually referenced with respect to `rbp`, the base pointer, which points to the top of the stack.)
+
+### Decryption is... weird
+
+    pxor xmm1, xmm0  # R10 round key
+    movdqa xmm0, [rbp-144]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+You'll notice a few things interesting here.
+
+First, there's a `pxor` at the end.
+This actually inverts the **final** round 10 round key addition (the round 10 round key is in `xmm0`).
+The `aesdec` instruction doesn't undo round 10, it actually undos half of round 10 and half of round 9.
+
+Additionally, there's an extra `aesimc` instruction. Intel is kind of stupid and decided that the `aesdec` function performs `InvMixColumns` *before* `InvAddRoundKey`, which is not the correct order to undo the sequence of operations we did in encryption.
+So they force us to use `aesimc` to transform the round key into a different one that works with their broken instruction.
+
+The rest of the code is similar:
+
+    movdqa xmm0, [rbp-128]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+    movdqa xmm0, [rbp-112]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+    movdqa xmm0, [rbp-96]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+    movdqa xmm0, [rbp-80]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+    movdqa xmm0, [rbp-64]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+    movdqa xmm0, [rbp-48]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+    movdqa xmm0, [rbp-32]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+    movdqa xmm0, [rbp-16]
+    aesimc xmm0, xmm0
+    aesdec xmm1, xmm0
+
+    aesdeclast xmm1, xmm4  # R1/R0
+
+We also have `aesdeclast` at the end, which undoes half of the first round, and the round key addition we did in "round 0".
