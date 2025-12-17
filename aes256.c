@@ -3,9 +3,6 @@
 #include <string.h>
 
 
-#define NUM_BLKS (2)
-
-
 void print_text(char *prefix, unsigned char *text) {
   printf("%s", prefix);
   for (int i = 0; i < 16; i++) {
@@ -28,6 +25,13 @@ int main() {
                            0x1f, 0x35, 0x2c, 0x07, 0x3b, 0x61, 0x08, 0xd7, 0x2d, 0x98, 0x10, 0xa3, 0x09, 0x14, 0xdf, 0xf4};
   unsigned char expanded_key[240];
   aes256_key_expansion(key, expanded_key);
+
+  unsigned char plaintext[16];
+  unsigned char ciphertext[16];
+  memcpy(plaintext, "aaaaaaaaaaaaaaa", 16);
+  print_text("Plaintext:  ", plaintext);
+  aes256_enc(plaintext, ciphertext, expanded_key);
+  print_text("Ciphertext: ", ciphertext);
 
   return 0;
 }

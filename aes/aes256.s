@@ -221,11 +221,6 @@ aes256_key_expansion:
     ret
 
 
-
-
-
-
-
 .section .text
 .globl aes256_enc
 .type aes256_enc, @function
@@ -236,7 +231,56 @@ aes256_enc:
 
     # rdi: points to plaintext
     # rsi: points to ciphertext
-    # rdx:
+    # rdx: points to key bytes
+
+    movdqu xmm1, [rdi]
+
+    # R0
+    movdqu xmm0, [rdx]
+    pxor xmm1, xmm0
+
+    # R1
+    movdqu xmm0, [rdx + 16]
+    aesenc xmm1, xmm0
+
+    movdqu xmm0, [rdx + 32]
+    aesenc xmm1, xmm0
+
+    movdqu xmm0, [rdx + 48]
+    aesenc xmm1, xmm0
+
+    movdqu xmm0, [rdx + 64]
+    aesenc xmm1, xmm0
+
+    movdqu xmm0, [rdx + 80]
+    aesenc xmm1, xmm0
+
+    movdqu xmm0, [rdx + 96]
+    aesenc xmm1, xmm0
+
+    movdqu xmm0, [rdx + 112]
+    aesenc xmm1, xmm0
+
+    movdqu xmm0, [rdx + 128]
+    aesenc xmm1, xmm0
+
+    movdqu xmm0, [rdx + 144]
+    aesenc xmm1, xmm0
+
+    movdqu xmm0, [rdx + 160]
+    aesenc xmm1, xmm0
+
+    movdqu xmm0, [rdx + 176]
+    aesenc xmm1, xmm0
+
+    movdqu xmm0, [rdx + 192]
+    aesenc xmm1, xmm0
+
+    movdqu xmm0, [rdx + 208]
+    aesenc xmm1, xmm0
+
+    movdqu xmm0, [rdx + 224]
+    aesenclast xmm1, xmm0
 
     movdqu [rsi], xmm1
     leave

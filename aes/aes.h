@@ -25,8 +25,8 @@ extern void aes256_key_expansion(const unsigned char *key,
 
 extern void aes256_enc(const unsigned char *plaintext,
                        unsigned char *ciphertext,
-                       const unsigned char *key);
+                       const unsigned char *expanded_key);
 
 extern void aes256_dec(const unsigned char *ciphertext,
                        unsigned char *plaintext,
-                       const unsigned char *key);
+                       const unsigned char *expanded_key);
