@@ -24,31 +24,10 @@ void print_text(char *prefix, unsigned char *text) {
 
 
 int main() {
-  unsigned char key[32];
-  memcpy(key, "abcdefghabcdefghabcdefghabcdefgh", 32);
-  unsigned char plaintext[16*NUM_BLKS];
-  memcpy(plaintext,
-         "test message",
-         16*NUM_BLKS);
-  unsigned char ciphertext[16*NUM_BLKS];
-  unsigned char newplaintext[16*NUM_BLKS];
-
-  for (int i = 0; i < NUM_BLKS; i++) {
-    print_text(i == 0 ? "plaintext   " : "            ", plaintext + 16*i);
-  }
-  printf("\n");
-
-  for (int i = 0; i < NUM_BLKS; i++) {
-    // ECB is not very secure
-    aes256_enc(plaintext + 16*i, ciphertext + 16*i, key);
-    print_text(i == 0 ? "ciphertext  " : "            ", ciphertext + 16*i);
-  }
-  printf("\n");
-
-  for (int i = 0; i < NUM_BLKS; i++) {
-    aes256_dec(ciphertext + 16*i, newplaintext + 16*i, key);
-    print_text(i == 0 ? "decrypted   " : "            ", newplaintext + 16*i);
-  }
+  unsigned char key[32] = {0x60, 0x3d, 0xeb, 0x10, 0x15, 0xca, 0x71, 0xbe, 0x2b, 0x73, 0xae, 0xf0, 0x85, 0x7d, 0x77, 0x81,
+                           0x1f, 0x35, 0x2c, 0x07, 0x3b, 0x61, 0x08, 0xd7, 0x2d, 0x98, 0x10, 0xa3, 0x09, 0x14, 0xdf, 0xf4};
+  unsigned char expanded_key[240];
+  aes256_key_expansion(key, expanded_key);
 
   return 0;
 }
