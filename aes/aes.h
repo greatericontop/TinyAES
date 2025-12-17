@@ -10,3 +10,11 @@ extern void aes128_enc(const unsigned char *plaintext,
 extern void aes128_dec(const unsigned char *ciphertext,
                        unsigned char *plaintext,
                        const unsigned char *key);
+
+extern void aes256_enc(const unsigned char *plaintext,
+                       unsigned char *ciphertext,
+                       const unsigned char *key);
+
+extern void aes256_dec(const unsigned char *ciphertext,
+                       unsigned char *plaintext,
+                       const unsigned char *key);
