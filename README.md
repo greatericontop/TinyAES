@@ -80,4 +80,4 @@ You can look at `aes256.c` for an example.
 
 ## In-depth explanation of the code
 
-Coming soon
+[AES-128 explanation](https://github.com/greatericontop/TinyAES/blob/main/AES128EXPLANATION.md)
