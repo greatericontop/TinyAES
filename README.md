@@ -78,6 +78,12 @@ void aes256_dec(const unsigned char *ciphertext,
 
 You can look at `aes256.c` for an example.
 
+## Extra Features
+
+- `fastxor.h`/`fastxor.s` - fast 16-byte XOR
+- `cbc.c` - contains a CBC implementation and demo
+- `ecbbench.c` - benchmark my implementation
+
 ## In-depth explanation of the code
 
 [AES-128 explanation](https://github.com/greatericontop/TinyAES/blob/main/AES128EXPLANATION.md)
